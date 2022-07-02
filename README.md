@@ -114,7 +114,7 @@ print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
 Drivers are provided for the `BH1750FVI` (ambient light, I2C `0x23`) sensor.
 
 ```python
-import machine, sgp30
+import machine
 i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
 # Not yet implemented
