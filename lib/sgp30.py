@@ -24,7 +24,6 @@ _SGP30_FRAME_LEN = const(3)
 _SGP30_DATA_LEN = const(2)
 _SGP30_CMD_LEN = const(2)
 
-
 def crc8(data):
     crc = 0xff
     for d in data:
@@ -38,18 +37,16 @@ def crc8(data):
         crc &= 0xff
     return crc
 
-
 def absolute_humidity(t, rh):
     """
     Returns the absolute humidity from the relative humidity and temperature.
     This value may be passed to SGP30.set_absolute_humidity for the on-chip
-    humiditity compensation.
+    humidity compensation.
 
     t is the temperature in °C
     rh is the relative humidity in percent (0-100)
     """
     return 216.7 * ((rh/100.0)*6.112*exp((17.62*t)/(243.12+t))/(273.15+t))
-
 
 class SGP30:
     def __init__(self, i2c, *, addr=_SGP30_I2C_DEFAULT_ADDR, baseline=None):
