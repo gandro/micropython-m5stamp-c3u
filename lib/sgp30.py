@@ -6,8 +6,8 @@ I2C-based driver for the SGP30 air quality sensor.
 from math import exp
 from micropython import const
 from ustruct import pack, pack_into, unpack_from
-from utime import sleep_ms
-from _thread import allocate_lock, start_new_thread
+from time import ticks_diff, ticks_ms
+from uasyncio import create_task, sleep_ms
 
 _SGP30_I2C_DEFAULT_ADDR = const(0x58)
 
@@ -24,6 +24,7 @@ _SGP30_FRAME_LEN = const(3)
 _SGP30_DATA_LEN = const(2)
 _SGP30_CMD_LEN = const(2)
 
+
 def crc8(data):
     crc = 0xff
     for d in data:
@@ -37,6 +38,7 @@ def crc8(data):
         crc &= 0xff
     return crc
 
+
 def absolute_humidity(t, rh):
     """
     Returns the absolute humidity from the relative humidity and temperature.
@@ -48,15 +50,16 @@ def absolute_humidity(t, rh):
     """
     return 216.7 * ((rh/100.0)*6.112*exp((17.62*t)/(243.12+t))/(273.15+t))
 
+
 class SGP30:
-    def __init__(self, i2c, *, addr=_SGP30_I2C_DEFAULT_ADDR, baseline=None):
+    def __init__(self, i2c, *, addr=_SGP30_I2C_DEFAULT_ADDR):
         self.i2c = i2c
         self.addr = addr
         self.eco2 = 400
         self.tvoc = 0
-        self.stopped = False
-        self.lock = allocate_lock()
-        feature_set = self._read_values(_SGP30_CMD_FEATURE_SET, 1, delay_ms=10)
+
+    async def init(self, baseline=None, absolute_humidity=None):
+        feature_set = await self._read_values(_SGP30_CMD_FEATURE_SET, 1, delay_ms=10)
         if feature_set[0] != _SGP30_FEATURE_SET:
             raise ValueError("device not found")
         self._write_values(_SGP30_CMD_INIT)
@@ -65,29 +68,29 @@ class SGP30:
                 self._write_values(_SGP30_CMD_WRITE_BASELINE, baseline)
             else:
                 raise ValueError("invalid argument(s) value")
-        start_new_thread(self._loop, ())
+        if absolute_humidity is not None:
+            self.set_absolute_humidity(absolute_humidity)
+        self.loop = create_task(self._loop())
 
-    def baseline(self):
+    async def baseline(self):
         """
         Gets the baseline as a 2-tuple. This can be passed to the constructor
         as the baseline value.
         """
-        with self.lock:
-            v = self._read_values(_SGP30_CMD_READ_BASELINE, 2, delay_ms=10)
-            return tuple(v)
+        v = await self._read_values(_SGP30_CMD_READ_BASELINE, 2, delay_ms=10)
+        return tuple(v)
 
-    def _loop(self):
+    async def _loop(self):
         # A sgp30_measure_iaq command has to be sent in regular intervals
         # of 1s to ensure proper operation of the dynamic baseline compensation
         # algorithm
         while True:
-            sleep_ms(1000)
-            with self.lock:
-                if self.stopped:
-                    break
-                eco2, tvoc = self._read_values(_SGP30_CMD_MEASURE, 2,
-                                               delay_ms=12)
-                self.eco2, self.tvoc = eco2, tvoc
+            start = ticks_ms()
+            self.eco2, self.tvoc = await self._read_values(
+                _SGP30_CMD_MEASURE, 2, delay_ms=12)
+            end = ticks_ms()
+            print(self.tvoc, ticks_diff(end, start))
+            await sleep_ms(1000 - ticks_diff(end, start))
 
     def set_absolute_humidity(self, ah):
         """
@@ -97,8 +100,7 @@ class SGP30:
         val = int(ah * 256)
         if not 0x0001 <= val <= 0xffff:
             raise ValueError("value out of range")
-        with self.lock:
-            self._write_values(_SGP30_CMD_WRITE_ABS_HUMIDITY, (val,))
+        self._write_values(_SGP30_CMD_WRITE_ABS_HUMIDITY, (val,))
 
     def measure(self):
         """
@@ -107,17 +109,18 @@ class SGP30:
 
         (eco2, tvoc)
         """
-        with self.lock:
-            eco2, tvoc = self.eco2, self.tvoc
-        return eco2, tvoc
+        if self.loop is None:
+            raise RuntimeError("sensor not initialized") # TODO find interned str
+        return self.eco2, self.tvoc
 
     def stop(self):
-        with self.lock:
-            self.stopped = True
+        if self.loop is not None:
+            self.loop.cancel()
+            self.loop = None
 
-    def _read_values(self, cmd, nvalues, delay_ms=1):
+    async def _read_values(self, cmd, nvalues, delay_ms=1):
         self.i2c.writeto(self.addr, pack(">H", cmd), False)
-        sleep_ms(delay_ms)
+        await sleep_ms(delay_ms)
 
         buf = memoryview(bytearray(nvalues * _SGP30_FRAME_LEN))
         self.i2c.readfrom_into(self.addr, buf, True)

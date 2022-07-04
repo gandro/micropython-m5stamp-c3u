@@ -82,42 +82,30 @@ device as follows:
 $ mpremote a0 cp -r lib :
 ```
 
-#### [ENV III Unit](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)
+This example uses drivers for the following units:
 
-Drivers are provided for the `SHT30` (temperature and humidity, I2C `0x44`) and
-`QMP6988` (absolute air pressure, I2C `0x70`) sensors.
-
-```python
-import machine
-i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
-
-# Not yet implemented
-```
-
-#### [TVOC/eCO2 Unit](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30)
-
-Drivers are provided for the `SGP30` (indoor air quality, I2C `0x44`) sensor.
+ - [TVOC/eCO2 Unit](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30):
+   `SGP30` (indoor air quality, I2C `0x44`)
+ - (*not yet implemented*) [ENV III Unit](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988):
+   `SHT30` (temperature and humidity, I2C `0x44`), `QMP6988` (absolute air pressure, I2C `0x70`)
+ - (*not yet implemented*) [DLight Unit](https://shop.m5stack.com/products/dlight-unit-ambient-light-sensor-bh1750fvi-tr):
+   `BH1750FVI` (ambient light, I2C `0x23`)
 
 ```python
-import machine, sgp30
-i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
+import machine, sgp30, uasyncio
+i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
-voc = sgp30.SGP30(i2c)
-# TODO: Use the ENVIII values here:
-#voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
-eco2, tvoc = voc.measure()
-print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
-```
+async def main():
+  voc = sgp30.SGP30(i2c)
+  await voc.init()
+  # TODO: Use the ENVIII values here:
+  #voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
+  while True:
+    eco2, tvoc = voc.measure()
+    print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
+    await uasyncio.sleep(1)
 
-#### [DLight Unit](https://shop.m5stack.com/products/dlight-unit-ambient-light-sensor-bh1750fvi-tr)
-
-Drivers are provided for the `BH1750FVI` (ambient light, I2C `0x23`) sensor.
-
-```python
-import machine
-i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
-
-# Not yet implemented
+uasyncio.run(main())
 ```
 
 ## Contributing
