@@ -72,19 +72,10 @@ while True:
 ### Grove Peripherals
 
 The following example assumes a Grove connector is soldered to the board on
-Port A (pins G0/G1/5V/GND).
+Port A (pins G0/G1/5V/GND). It assumes the following units are all connected
+to the same I2C bus via the Grove Hub:
 
-To install the Grove Micropython modules using
-[`mpremote`](https://pypi.org/project/mpremote/), copy the `lib/` folder to your
-device as follows:
-
-```console
-$ mpremote a0 cp -r lib :
-```
-
-This example uses drivers for the following units:
-
- - [TVOC/eCO2 Unit](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30):
+- [TVOC/eCO2 Unit](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30):
    `SGP30` (indoor air quality, I2C `0x44`)
  - (*not yet implemented*) [ENV III Unit](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988):
    `SHT30` (temperature and humidity, I2C `0x44`), `QMP6988` (absolute air pressure, I2C `0x70`)
@@ -106,6 +97,14 @@ async def main():
     await uasyncio.sleep(1)
 
 uasyncio.run(main())
+```
+
+*Note:* To install the required Micropython drivers using
+[`mpremote`](https://pypi.org/project/mpremote/), copy the `lib/` folder to your
+device as follows:
+
+```console
+$ mpremote a0 cp -r lib :
 ```
 
 ## Contributing
