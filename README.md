@@ -75,11 +75,11 @@ The following example assumes a Grove connector is soldered to the board on
 Port A (pins G0/G1/5V/GND). It assumes the following units are all connected
 to the same I2C bus via the Grove Hub:
 
-- [TVOC/eCO2 Unit](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30):
+- [TVOC/eCO2 Unit](https://docs.m5stack.com/en/unit/tvoc):
    `SGP30` (indoor air quality, I2C `0x44`)
- - (*not yet implemented*) [ENV III Unit](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988):
+ - (*not yet implemented*) [ENV III Unit](https://docs.m5stack.com/en/unit/envIII):
    `SHT30` (temperature and humidity, I2C `0x44`), `QMP6988` (absolute air pressure, I2C `0x70`)
- - (*not yet implemented*) [DLight Unit](https://shop.m5stack.com/products/dlight-unit-ambient-light-sensor-bh1750fvi-tr):
+ - (*not yet implemented*) [DLight Unit](https://docs.m5stack.com/en/unit/dlight):
    `BH1750FVI` (ambient light, I2C `0x23`)
 
 ```python
