@@ -110,7 +110,7 @@ class SGP30:
         (eco2, tvoc)
         """
         if self.loop is None:
-            raise RuntimeError("sensor not initialized") # TODO find interned str
+            raise RuntimeError("device not initialized")
         return self.eco2, self.tvoc
 
     def stop(self):
