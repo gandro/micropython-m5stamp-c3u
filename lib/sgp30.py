@@ -77,7 +77,6 @@ class SGP30:
             self.eco2, self.tvoc = await self._read_values(
                 _SGP30_CMD_MEASURE, 2, delay_ms=12)
             end = ticks_ms()
-            print(self.tvoc, ticks_diff(end, start))
             await sleep_ms(1000 - ticks_diff(end, start))
 
     def set_absolute_humidity(self, ah):
