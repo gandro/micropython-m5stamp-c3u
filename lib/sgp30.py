@@ -9,6 +9,8 @@ from ustruct import pack, pack_into, unpack_from
 from time import ticks_diff, ticks_ms
 from uasyncio import create_task, sleep_ms
 
+from checksum import crc8
+
 _SGP30_I2C_DEFAULT_ADDR = const(0x58)
 
 _SGP30_CMD_INIT = const(0x2003)
@@ -23,20 +25,6 @@ _SGP30_FEATURE_SET = const(0x0022)
 _SGP30_FRAME_LEN = const(3)
 _SGP30_DATA_LEN = const(2)
 _SGP30_CMD_LEN = const(2)
-
-
-def crc8(data):
-    crc = 0xff
-    for d in data:
-        crc ^= d
-        for _ in range(8):
-            if crc & 0x80:
-                crc <<= 1
-                crc ^= 0x31
-            else:
-                crc <<= 1
-        crc &= 0xff
-    return crc
 
 
 def absolute_humidity(t, rh):
@@ -110,7 +98,7 @@ class SGP30:
         (eco2, tvoc)
         """
         if self.loop is None:
-            raise RuntimeError("device not initialized")
+            raise RuntimeError("device not ready")
         return self.eco2, self.tvoc
 
     def stop(self):
