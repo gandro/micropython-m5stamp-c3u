@@ -83,15 +83,24 @@ to the same I2C bus via the Grove Hub:
    `BH1750FVI` (ambient light, I2C `0x23`)
 
 ```python
-import machine, sgp30, uasyncio
+import machine
+import uasyncio
+
+import sht30
+import sgp30
+
 i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
 async def main():
+  rht = sht30.SHT30(i2c)
   voc = sgp30.SGP30(i2c)
   await voc.init()
-  # TODO: Use the ENVIII values here:
-  #voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
+
   while True:
+    temp, humidity = rht.measure()
+    print("Temp/Humidity: {}°C/{}%".format(temp, humidity))
+
+    voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
     eco2, tvoc = voc.measure()
     print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
     await uasyncio.sleep(1)
