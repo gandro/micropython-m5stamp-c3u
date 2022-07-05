@@ -94,7 +94,8 @@ i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 async def main():
   rht = sht30.SHT30(i2c)
   voc = sgp30.SGP30(i2c)
-  await voc.init()
+
+  await voc.start()
 
   while True:
     temp, humidity = rht.measure()

@@ -46,7 +46,7 @@ class SGP30:
         self.eco2 = 400
         self.tvoc = 0
 
-    async def init(self, baseline=None, absolute_humidity=None):
+    async def start(self, baseline=None):
         feature_set = await self._read_values(_SGP30_CMD_FEATURE_SET, 1, delay_ms=10)
         if feature_set[0] != _SGP30_FEATURE_SET:
             raise ValueError("device not found")
@@ -56,8 +56,6 @@ class SGP30:
                 self._write_values(_SGP30_CMD_WRITE_BASELINE, baseline)
             else:
                 raise ValueError("invalid argument(s) value")
-        if absolute_humidity is not None:
-            self.set_absolute_humidity(absolute_humidity)
         self.loop = create_task(self._loop())
 
     async def baseline(self):
