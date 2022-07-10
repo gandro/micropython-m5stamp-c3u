@@ -88,12 +88,14 @@ import uasyncio
 
 import sht30
 import sgp30
+import qmp6988
 
 i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
 async def main():
   rht = sht30.SHT30(i2c)
   voc = sgp30.SGP30(i2c)
+  prt = qmp6988.QMP6988(i2c)
 
   await voc.start()
 
@@ -104,6 +106,10 @@ async def main():
     voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
     eco2, tvoc = voc.measure()
     print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
+
+    temp, pressure = prt.measure()
+    print("Temp/Pressure: {}°C/{}Pa".format(temp, pressure))
+
     await uasyncio.sleep(1)
 
 uasyncio.run(main())
