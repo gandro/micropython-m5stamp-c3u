@@ -79,13 +79,14 @@ to the same I2C bus via the Grove Hub:
    `SGP30` (indoor air quality, I2C `0x44`)
  - [ENV III Unit](https://docs.m5stack.com/en/unit/envIII):
    `SHT30` (temperature and humidity, I2C `0x44`), `QMP6988` (absolute air pressure, I2C `0x70`)
- - (*not yet implemented*) [DLight Unit](https://docs.m5stack.com/en/unit/dlight):
+ - [DLight Unit](https://docs.m5stack.com/en/unit/dlight):
    `BH1750FVI` (ambient light, I2C `0x23`)
 
 ```python
 import machine
 import uasyncio
 
+import bh1750fvi
 import sht30
 import sgp30
 import qmp6988
@@ -93,6 +94,7 @@ import qmp6988
 i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
 async def main():
+  dlx = bh1750fvi.BH1750FVI(i2c)
   rht = sht30.SHT30(i2c)
   voc = sgp30.SGP30(i2c)
   prt = qmp6988.QMP6988(i2c)
@@ -100,6 +102,9 @@ async def main():
   await voc.start()
 
   while True:
+    light = dlx.measure()
+    print("Ambient Light: {}lx".format(light))
+
     temp, humidity = rht.measure()
     print("Temp/Humidity: {}°C/{}%".format(temp, humidity))
 
