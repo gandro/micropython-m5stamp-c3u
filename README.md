@@ -38,7 +38,7 @@ as follows:
 
 ```
 esptool.py --chip esp32c3 --port /dev/ttyACM0 --baud 460800 \
-    write_flash --erase-all -z 0x0 esp32c3-usb-20220618-v1.19.1.bin
+    write_flash -z 0x0 esp32c3-usb-20220618-v1.19.1.bin
 ```
 
 Reset the device and you will be able to use the Micropython console via the
