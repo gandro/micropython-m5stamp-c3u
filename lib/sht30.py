@@ -9,7 +9,7 @@ from ustruct import pack, unpack_from
 
 from checksum import crc8
 
-_SHT30_I2C_DEFAULT_ADDR = const(0x44)
+I2C_DEFAULT_ADDR = const(0x44)
 
 _SHT30_CMD_MEASURE_REP_HI_CS_EN = const(0x2c06)
 _SHT30_CMD_RESET = const(0x30a2)
@@ -23,7 +23,7 @@ _SHT30_DATA_LEN = const(2)
 
 
 class SHT30:
-    def __init__(self, i2c, *, addr=_SHT30_I2C_DEFAULT_ADDR):
+    def __init__(self, i2c, *, addr=I2C_DEFAULT_ADDR):
         self.i2c = i2c
         self.addr = addr
         self.reset()

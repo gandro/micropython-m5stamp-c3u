@@ -7,7 +7,7 @@ I2C-based driver for the BH1750FVI ambient light sensor.
 from micropython import const
 from time import sleep_ms
 
-_BH1750FVI_I2C_DEFAULT_ADDR = const(0x23)
+I2C_DEFAULT_ADDR = const(0x23)
 
 _BH1750FVI_POWER_DOWN = const(0b0000_0000)
 
@@ -30,7 +30,7 @@ RESOLUTION_LOW = const(0b0011)
 
 
 class BH1750FVI:
-    def __init__(self, i2c, addr=_BH1750FVI_I2C_DEFAULT_ADDR, *,
+    def __init__(self, i2c, addr=I2C_DEFAULT_ADDR, *,
                  mode=MODE_CONTINUOUS, resolution=RESOLUTION_HIGH):
         self.i2c = i2c
         self.addr = addr

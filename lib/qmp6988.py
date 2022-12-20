@@ -7,7 +7,7 @@ from micropython import const
 from ustruct import unpack_from
 from utime import sleep_ms
 
-_QMP6988_I2C_DEFAULT_ADDR = const(0x70)
+I2C_DEFAULT_ADDR = const(0x70)
 
 _QMP6988_CHIP_ID = const(0xd1)
 _QMP6988_CHIP_ID_VALUE = const(0x5c)
@@ -81,7 +81,7 @@ STANDBY_4000_MS = const(0b111)
 
 
 class QMP6988:
-    def __init__(self, i2c, addr=_QMP6988_I2C_DEFAULT_ADDR, *,
+    def __init__(self, i2c, addr=I2C_DEFAULT_ADDR, *,
                  power_mode=PWR_MODE_NORMAL,
                  press_samples=PRESS_SAMPLES_8,
                  temp_samples=TEMP_SAMPLES_1,

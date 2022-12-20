@@ -38,7 +38,7 @@ as follows:
 
 ```
 esptool.py --chip esp32c3 --port /dev/ttyACM0 --baud 460800 \
-    write_flash -z 0x0 esp32c3-usb-20220618-v1.19.1.bin
+    write_flash -z 0x0 esp32c3-usb-20221216-unstable-v1.19.1-774-ged58d6e4c.bin
 ```
 
 Reset the device and you will be able to use the Micropython console via the
@@ -127,6 +127,11 @@ device as follows:
 ```console
 $ mpremote a0 cp -r lib :
 ```
+
+## Requirements
+
+  - `lib/homeassist` requires polling support on SSL sockets when `use_ssl=True`
+    ([micropython/micropython#9871](https://github.com/micropython/micropython/pull/9871))
 
 ## Contributing
 

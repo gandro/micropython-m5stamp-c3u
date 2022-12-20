@@ -11,7 +11,7 @@ from uasyncio import create_task, sleep_ms
 
 from checksum import crc8
 
-_SGP30_I2C_DEFAULT_ADDR = const(0x58)
+I2C_DEFAULT_ADDR = const(0x58)
 
 _SGP30_CMD_INIT = const(0x2003)
 _SGP30_CMD_MEASURE = const(0x2008)
@@ -40,7 +40,7 @@ def absolute_humidity(t, rh):
 
 
 class SGP30:
-    def __init__(self, i2c, *, addr=_SGP30_I2C_DEFAULT_ADDR):
+    def __init__(self, i2c, *, addr=I2C_DEFAULT_ADDR):
         self.i2c = i2c
         self.addr = addr
         self.eco2 = 400

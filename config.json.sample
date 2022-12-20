@@ -1,0 +1,8 @@
+{
+    "wifi_ssid": "WiFi SSID",
+    "wifi_key": "WiFI Password",
+    "ha_host": "homeassistant.local",
+    "ha_port": 443,
+    "ha_ssl": true,
+    "ha_token": "<home assistant long lived access token>"
+}
