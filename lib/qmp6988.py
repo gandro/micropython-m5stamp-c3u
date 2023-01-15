@@ -162,7 +162,7 @@ class QMP6988:
     def reset(self):
         try:
             self.i2c.writeto_mem(self.addr, _QMP6988_RESET,
-                             bytes([_QMP6988_RESET_VALUE]))
+                                 bytes([_QMP6988_RESET_VALUE]))
         except OSError:
             # It seems that that the device immediately resets upon soft-reset
             # without finishing the I2C transaction, causing an ETIMEDOUT here.
@@ -208,7 +208,7 @@ class QMP6988:
             self.i2c.readfrom_mem_into(
                 self.addr, _QMP6988_DEVICE_STATUS, status)
             measure = ((status[0] & _QMP6988_DEVICE_STATUS_MEASURE_MASK)
-                        >> _QMP6988_DEVICE_STATUS_MEASURE_POS)
+                       >> _QMP6988_DEVICE_STATUS_MEASURE_POS)
             if measure == 0:
                 break
         else:
