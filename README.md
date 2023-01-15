@@ -91,7 +91,7 @@ import sht30
 import sgp30
 import qmp6988
 
-i2c = machine.SoftI2C(sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
+i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 
 async def main():
   dlx = bh1750fvi.BH1750FVI(i2c)
