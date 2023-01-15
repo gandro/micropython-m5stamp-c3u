@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Sebastian Wicki
+# Copyright (c) 2023 Sebastian Wicki
 # SPDX-License-Identifier: MIT
 """
 I2C-based driver for the QMP6988 temperature and pressure sensor.
@@ -189,17 +189,17 @@ class QMP6988:
             control[0] |= PWR_MODE_FORCED
             self.i2c.writeto_mem(self.addr, _QMP6988_CONTROL, control)
 
-            status = bytearray(1)
-            for _ in range(100):
-                sleep_ms(10)
-                self.i2c.readfrom_mem_into(
-                    self.addr, _QMP6988_DEVICE_STATUS, status)
-                measure = ((status[0] & _QMP6988_DEVICE_STATUS_MEASURE_MASK)
-                           >> _QMP6988_DEVICE_STATUS_MEASURE_POS)
-                if measure == 0:
-                    break
-            else:
-                raise RuntimeError("device not ready")
+        status = bytearray(1)
+        for _ in range(100):
+            sleep_ms(10)
+            self.i2c.readfrom_mem_into(
+                self.addr, _QMP6988_DEVICE_STATUS, status)
+            measure = ((status[0] & _QMP6988_DEVICE_STATUS_MEASURE_MASK)
+                        >> _QMP6988_DEVICE_STATUS_MEASURE_POS)
+            if measure == 0:
+                break
+        else:
+            raise RuntimeError("device not ready")
 
         return temp_en, press_en
 
