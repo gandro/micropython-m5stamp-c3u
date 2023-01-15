@@ -160,9 +160,20 @@ class QMP6988:
         self.i2c.writeto_mem(self.addr, _QMP6988_IIR, filter)
 
     def reset(self):
-        self.i2c.writeto_mem(self.addr, _QMP6988_RESET,
+        try:
+            self.i2c.writeto_mem(self.addr, _QMP6988_RESET,
                              bytes([_QMP6988_RESET_VALUE]))
+        except OSError:
+            # It seems that that the device immediately resets upon soft-reset
+            # without finishing the I2C transaction, causing an ETIMEDOUT here.
+            # Thus, we silently ignore those errors and instead read back the
+            # the expected value after reset (ensuring that the device is online
+            # again)
+            pass
         sleep_ms(10)
+        reset = self.i2c.readfrom_mem(self.addr, _QMP6988_RESET, 1)
+        if reset != b"\0":
+            raise RuntimeError("device not ready")
 
     def _measure_prepare(self):
         """
