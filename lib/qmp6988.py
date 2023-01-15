@@ -201,8 +201,10 @@ class QMP6988:
             self.i2c.writeto_mem(self.addr, _QMP6988_CONTROL, control)
 
         status = bytearray(1)
-        for _ in range(100):
-            sleep_ms(10)
+        for i in range(100):
+            # skip initial sleep in normal mode, we expect it to be ready
+            if i > 0 or mode != PWR_MODE_NORMAL:
+                sleep_ms(10)
             self.i2c.readfrom_mem_into(
                 self.addr, _QMP6988_DEVICE_STATUS, status)
             measure = ((status[0] & _QMP6988_DEVICE_STATUS_MEASURE_MASK)
