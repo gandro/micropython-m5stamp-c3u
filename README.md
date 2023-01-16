@@ -75,12 +75,18 @@ The following example assumes a Grove connector is soldered to the board on
 Port A (pins G0/G1/5V/GND). It assumes the following units are all connected
 to the same I2C bus via the Grove Hub:
 
- - [TVOC/eCO2 Unit](https://docs.m5stack.com/en/unit/tvoc):
-   `SGP30` (indoor air quality, I2C `0x44`)
+ - [CO2 Unit](https://docs.m5stack.com/en/unit/co2):
+   `SCD40` (co2, temperature and humidity, I2C `0x62`)
  - [ENV III Unit](https://docs.m5stack.com/en/unit/envIII):
    `SHT30` (temperature and humidity, I2C `0x44`), `QMP6988` (absolute air pressure, I2C `0x70`)
  - [DLight Unit](https://docs.m5stack.com/en/unit/dlight):
    `BH1750FVI` (ambient light, I2C `0x23`)
+
+Earlier versions of this project used a cheaper eCO2 sensor, but it is no
+longer in use:
+
+ - [TVOC/eCO2 Unit](https://docs.m5stack.com/en/unit/tvoc):
+   `SGP30` (indoor air quality, I2C `0x58`)
 
 ```python
 import machine
@@ -88,7 +94,7 @@ import uasyncio
 
 import bh1750fvi
 import sht30
-import sgp30
+import scd40
 import qmp6988
 
 i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
@@ -96,10 +102,11 @@ i2c = machine.I2C(0, sda=machine.Pin(1), scl=machine.Pin(0), freq=400000)
 async def main():
   dlx = bh1750fvi.BH1750FVI(i2c)
   rht = sht30.SHT30(i2c)
-  voc = sgp30.SGP30(i2c)
+  scd = scd40.SCD40(i2c)
   prt = qmp6988.QMP6988(i2c)
 
-  await voc.start()
+  print("Initializing sensors...")
+  await scd.start()
 
   while True:
     light = dlx.measure()
@@ -108,12 +115,12 @@ async def main():
     temp, humidity = rht.measure()
     print("Temp/Humidity: {}°C/{}%".format(temp, humidity))
 
-    voc.set_absolute_humidity(sgp30.absolute_humidity(temp, humidity))
-    eco2, tvoc = voc.measure()
-    print("eCO2/TVOC: {}ppm/{}ppb".format(eco2, tvoc))
-
     temp, pressure = prt.measure()
     print("Temp/Pressure: {}°C/{}Pa".format(temp, pressure))
+
+    scd.set_ambient_pressure(pressure)
+    co2, temp, humidity = scd.measure()
+    print("CO2/Temp/Humidity: {}ppm/{}°C/{}%".format(co2, temp, humidity))
 
     await uasyncio.sleep(1)
 
